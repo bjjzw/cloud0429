@@ -1,0 +1,24 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: provider-nacospayment8001
+  profiles:
+    active: dev   #开发环境
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.20.244:8848
+      config:
+        server-addr: 192.168.20.244:8848
+        file-extension: yaml
+        group: payment
+    sentinel:
+      transport:
+        dashboard: 192.168.20.244:9090
+        port: 8719
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

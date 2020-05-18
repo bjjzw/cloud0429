@@ -1,0 +1,38 @@
+package com.dascom.main;
+
+import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.hystrix.EnableHystrix;
+import org.springframework.context.annotation.Bean;
+
+/**
+ * Created by jiazw on 4/29/2020.
+ */
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableHystrix
+public class PaymentHystrixMain8081 {
+
+
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentHystrixMain8081.class);
+
+
+    }
+
+
+
+   @Bean
+    public ServletRegistrationBean getServlet(){
+        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean<HystrixMetricsStreamServlet> servletRegistrationBean = new ServletRegistrationBean<>(streamServlet);
+        servletRegistrationBean.setLoadOnStartup(1);
+        servletRegistrationBean.addUrlMappings("/hystrix.stream");
+        servletRegistrationBean.setName("HystrixMetricsStreamServlet");
+
+        return  servletRegistrationBean;
+    }
+}

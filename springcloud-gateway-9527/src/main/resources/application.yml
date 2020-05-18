@@ -1,0 +1,30 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        # 路由标识（id：标识，具有唯一性）   简单尝试
+        - id: route_simple
+          # 目标服务地址（uri：地址，请求转发后的地址）
+          #uri: http://192.168.60.251:8082
+          uri: lb://provider-payment8001
+          # 路由条件（predicates：断言，匹配 HTTP 请求内容）
+          predicates:
+            ## 转发地址格式为 uri/archive
+            - Path=/open/api/payment/**
+          filters:
+          ## 截取路径位数
+            - StripPrefix=2
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.60.251:7001/eureka/
+    register-with-eureka: true
+    fetch-registry: true

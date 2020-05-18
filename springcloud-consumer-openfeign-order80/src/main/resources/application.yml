@@ -1,0 +1,13 @@
+server:
+  port: 80
+spring:
+  application:
+    name: feignOrder
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://192.168.60.251:7001/eureka/
+ribbon:
+  Readtimeout: 5000
+  ConnectionTimeout: 5000

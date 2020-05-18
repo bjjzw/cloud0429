@@ -1,0 +1,12 @@
+#使用zookeeper注意pom文件引入的zookeeper版本（本案列使用的3.5.3bet版）。与zookeeper集群的版本一致。否则会导致启动失败
+server:
+  port: 80
+spring:
+  application:
+    name: conOrderService
+  cloud:
+    zookeeper:
+      connect-string: 192.168.60.251:2181
+
+
+

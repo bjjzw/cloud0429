@@ -1,0 +1,26 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: config-client
+  cloud:
+    #客户端配置
+    config:
+      label: master #客户端使用的分支
+      name: payment #配置文件名
+      profile: dev  #配置后缀名称
+      uri: http://192.168.60.251:8888 #配置服务中心uri
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://192.168.60.251:7001/eureka/ #注册中心
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

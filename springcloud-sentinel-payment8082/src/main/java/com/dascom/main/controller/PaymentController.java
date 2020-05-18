@@ -1,0 +1,61 @@
+package com.dascom.main.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.fastjson.JSON;
+import com.dascom.main.entity.Payment;
+import com.dascom.main.response.BaseResponse;
+import com.dascom.main.service.PaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+
+@RestController
+public class PaymentController {
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @GetMapping("/{id}")
+    @SentinelResource("/getOrder")
+    public String getPaymentById(@PathVariable("id") long id) {
+        Payment payment = paymentService.selectPaymentById(id);
+
+        BaseResponse<Payment> objectBaseResponse = new BaseResponse<>();
+        ArrayList<Payment> data = new ArrayList<>();
+        data.add(payment);
+        objectBaseResponse.setCode(200);
+        objectBaseResponse.setMessage("success");
+        objectBaseResponse.setData(data);
+
+        String paymentInfo = JSON.toJSONString(objectBaseResponse);
+        return paymentInfo;
+    }
+    @GetMapping("/testA")
+    public String getTestA() {
+
+        return "TestA";
+    }
+
+    @GetMapping("/testB")
+    public String getTestB() {
+
+        return "TestB";
+    }
+
+    @PostMapping("/insert")
+    public String createPayment(@RequestBody Payment payment) {
+
+
+        long id = paymentService.insertPayment(payment);
+
+        BaseResponse<Payment> objectBaseResponse = new BaseResponse<>();
+        ArrayList<Payment> data = new ArrayList<>();
+        objectBaseResponse.setCode(200);
+        objectBaseResponse.setMessage("success");
+        String paymentInfo = JSON.toJSONString(objectBaseResponse);
+        return paymentInfo;
+    }
+
+
+}

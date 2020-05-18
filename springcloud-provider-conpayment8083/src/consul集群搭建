@@ -1,0 +1,48 @@
+集群启动
+10.200.110.90启动consul
+consul agent -server -bootstrap-expect=3 -data-dir=/tmp/consul -node=10.200.110.90 -bind=10.200.110.90 -client=0.0.0.0 -datacenter=wanbu -ui
+10.200.110.91启动consul
+consul agent -server -bootstrap-expect 3 -data-dir /tmp/consul -node 10.200.110.91 -bind=10.200.110.91 -client=0.0.0.0 -datacenter=wanbu -ui
+10.200.110.93启动consul
+consul agent -server -bootstrap-expect 3 -data-dir /tmp/consul -node 10.200.110.93 -bind=10.200.110.93 -client=0.0.0.0 -datacenter=wanbu -ui
+参数说明：
+
+ server： 以server身份启动。默认是client
+ bootstrap-expect：集群要求的最少server数量，当低于这个数量，集群即失效。
+ data-dir：data存放的目录，更多信息请参阅consul数据同步机制
+ node：节点id，集群中的每个node必须有一个唯一的名称。默认情况下，Consul使用机器的hostname
+ bind：监听的ip地址。默认绑定0.0.0.0，可以不指定。表示Consul监听的地址,而且它必须能够被集群中的其他节点访问。Consul默认会监听第一个private IP,但最好还是提供一个。生产设备上的服务器通常有好几个网卡，所以指定一个不会出错
+ client: 客户端的ip地址，0.0.0.0是指谁都可以访问（不加这个，下面的ui :8500无法访问）
+ ui: 可以访问UI界面
+-config-dir指定配置文件夹，Consul会加载其中的所有文件
+-datacenter 指定数据中心名称，默认是dc1
+
+此时三台机器都会打印：
+
+    2019/03/20 10:57:36 [INFO] agent: Started HTTP server on 127.0.0.1:8500 (tcp)
+    2019/03/20 10:57:36 [INFO] agent: started state syncer
+    2019/03/20 10:57:44 [ERR] agent: failed to sync remote state: No cluster leader
+此时三台机器还未join，不能算是一个集群，三台机器上的consul均不能正常工作，因为leader未选出。
+
+三台机器组成consul集群
+
+consul集群:当一个consul agent启动后，它不知道任何其他节点,要学习到集群中的其他节点，agent必须加入一个已经存在的集群(cluster)。要加入这样的集群，它只需要知道这个集群中的一个节点即可。它加入后，将会和这个member gossip（交谈）并迅速发现集群中的其他节点。一个consul agent可以加入任何类型的其他agent，而不只是那些运行于server mode的agent。
+
+分别登录第2台和第3台虚拟机上执行如下命令，让consul加入集群：
+10.200.110.91加入10.200.110.90
+
+[root@localhost consul-cluster]# consul join 10.200.110.90
+Successfully joined cluster by contacting 1 nodes.
+[root@localhost consul-cluster]#
+10.200.110.93加入10.200.110.90
+
+[root@localhost consul-cluster]# consul join 10.200.110.90
+Successfully joined cluster by contacting 1 nodes.
+[root@localhost consul-cluster]#
+很快三台机器都会打印：
+
+2019/03/20 10:59:12 [INFO] raft: Added peer d89335fd-cfb8-1fc0-3902-b847e125fa2c, starting replication
+2019/03/20 10:59:12 [INFO] consul: cluster leadership acquired
+2019/03/20 10:59:12 [INFO] consul: New leader elected: 10.200.110.90
+
+访问10.200.110.90:8500就可看到web页面
